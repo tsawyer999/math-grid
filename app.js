@@ -4,6 +4,8 @@ const app = document.getElementById('app');
 
 let startTime;
 let timerInterval;
+let correctAnswers = 0;
+const totalAnswers = 144; // 12x12 grid
 
 function generateShuffledNumbers() {
     const numbers = [];
@@ -33,7 +35,14 @@ function startTimer() {
     }, 100);
 }
 
+function stopTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
+}
+
 startButton.addEventListener('click', () => {
+    correctAnswers = 0;
     startTimer();
 
     // Assign unique random numbers to top row (skip first column)
@@ -63,10 +72,24 @@ startButton.addEventListener('click', () => {
                 const expectedResult = rowNum * colNum;
                 const userInput = parseInt(e.target.value);
 
-                if (userInput === expectedResult) {
+                const wasCorrect = e.target.style.color === 'green';
+                const isCorrect = userInput === expectedResult;
+
+                if (isCorrect) {
                     e.target.style.color = 'green';
+                    if (!wasCorrect) {
+                        correctAnswers++;
+                    }
                 } else {
                     e.target.style.color = 'red';
+                    if (wasCorrect) {
+                        correctAnswers--;
+                    }
+                }
+
+                // Check if all answers are correct
+                if (correctAnswers === totalAnswers) {
+                    stopTimer();
                 }
             });
 
