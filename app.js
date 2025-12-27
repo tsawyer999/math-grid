@@ -2,14 +2,20 @@ const startButton = document.getElementById('start');
 const timerDiv = document.getElementById('timer');
 const app = document.getElementById('app');
 
+const GRID_SIZE = 13;
+const MAX_NUMBER = 12;
+const TIMER_UPDATE_INTERVAL = 100;
+const SECONDS_PER_MINUTE = 60;
+const MS_PER_SECOND = 1000;
+
 let startTime;
 let timerInterval;
 let correctAnswers = 0;
-const totalAnswers = 144; // 12x12 grid
+const totalAnswers = MAX_NUMBER * MAX_NUMBER;
 
 function generateShuffledNumbers() {
     const numbers = [];
-    for (let i = 1; i <= 12; i++) {
+    for (let i = 1; i <= MAX_NUMBER; i++) {
         numbers.push(i);
     }
     // Shuffle array
@@ -28,11 +34,11 @@ function startTimer() {
     }
 
     timerInterval = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startTime) / 1000);
-        const minutes = Math.floor(elapsed / 60);
-        const seconds = elapsed % 60;
+        const elapsed = Math.floor((Date.now() - startTime) / MS_PER_SECOND);
+        const minutes = Math.floor(elapsed / SECONDS_PER_MINUTE);
+        const seconds = elapsed % SECONDS_PER_MINUTE;
         timerDiv.textContent = `${minutes} minutes ${seconds} seconds`;
-    }, 100);
+    }, TIMER_UPDATE_INTERVAL);
 }
 
 function stopTimer() {
@@ -45,29 +51,33 @@ startButton.addEventListener('click', () => {
     correctAnswers = 0;
     startTimer();
 
-    // Assign unique random numbers to top row (skip first column)
     const cells = app.querySelectorAll('div');
+
+    // Set first cell to 'X'
+    cells[0].textContent = 'X';
+
+    // Assign unique random numbers to top row (skip first column)
     const topRowNumbers = generateShuffledNumbers();
-    for (let i = 1; i < 13; i++) {
+    for (let i = 1; i < GRID_SIZE; i++) {
         cells[i].textContent = topRowNumbers[i - 1];
     }
 
     // Assign unique random numbers to first column (skip first row)
     const firstColumnNumbers = generateShuffledNumbers();
-    for (let i = 1; i < 13; i++) {
-        cells[i * 13].textContent = firstColumnNumbers[i - 1];
+    for (let i = 1; i < GRID_SIZE; i++) {
+        cells[i * GRID_SIZE].textContent = firstColumnNumbers[i - 1];
     }
 
     // Add input fields to cells not in first row or first column
-    for (let row = 1; row < 13; row++) {
-        for (let col = 1; col < 13; col++) {
-            const index = row * 13 + col;
+    for (let row = 1; row < GRID_SIZE; row++) {
+        for (let col = 1; col < GRID_SIZE; col++) {
+            const index = row * GRID_SIZE + col;
             const input = document.createElement('input');
             input.type = 'text';
 
             // Add input event listener to validate
             input.addEventListener('input', (e) => {
-                const rowNum = parseInt(cells[row * 13].textContent);
+                const rowNum = parseInt(cells[row * GRID_SIZE].textContent);
                 const colNum = parseInt(cells[col].textContent);
                 const expectedResult = rowNum * colNum;
                 const userInput = parseInt(e.target.value);
