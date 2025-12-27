@@ -48,4 +48,30 @@ startButton.addEventListener('click', () => {
     for (let i = 1; i < 13; i++) {
         cells[i * 13].textContent = firstColumnNumbers[i - 1];
     }
+
+    // Add input fields to cells not in first row or first column
+    for (let row = 1; row < 13; row++) {
+        for (let col = 1; col < 13; col++) {
+            const index = row * 13 + col;
+            const input = document.createElement('input');
+            input.type = 'text';
+
+            // Add input event listener to validate
+            input.addEventListener('input', (e) => {
+                const rowNum = parseInt(cells[row * 13].textContent);
+                const colNum = parseInt(cells[col].textContent);
+                const expectedResult = rowNum * colNum;
+                const userInput = parseInt(e.target.value);
+
+                if (userInput === expectedResult) {
+                    e.target.style.color = 'green';
+                } else {
+                    e.target.style.color = 'red';
+                }
+            });
+
+            cells[index].innerHTML = '';
+            cells[index].appendChild(input);
+        }
+    }
 });
