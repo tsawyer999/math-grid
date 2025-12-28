@@ -46,7 +46,7 @@ function stopTimer() {
         clearInterval(timerInterval);
     }
 }
-
+/*
 startButton.addEventListener('click', () => {
     correctAnswers = 0;
     startTimer();
@@ -108,3 +108,16 @@ startButton.addEventListener('click', () => {
         }
     }
 });
+*/
+// Export for testing
+export {
+    generateShuffledNumbers,
+    startTimer,
+    stopTimer,
+    GRID_SIZE,
+    MAX_NUMBER,
+    TIMER_UPDATE_INTERVAL,
+    SECONDS_PER_MINUTE,
+    MS_PER_SECOND,
+    totalAnswers
+};
