@@ -1,21 +1,7 @@
-export {
-    generateShuffledNumbers,
-    startTimer,
-    stopTimer,
-    GRID_SIZE,
-    MAX_NUMBER,
-    TIMER_UPDATE_INTERVAL,
-    SECONDS_PER_MINUTE,
-    MS_PER_SECOND,
-    totalAnswers
-};
-
 const timerDiv = document.getElementById('timer');
 const app = document.getElementById('app');
-const startButton = document.getElementById('start');
 
-const GRID_SIZE = 13;
-const MAX_NUMBER = 12;
+const GRID_SIZE = 12;
 const TIMER_UPDATE_INTERVAL = 100;
 const SECONDS_PER_MINUTE = 60;
 const MS_PER_SECOND = 1000;
@@ -23,7 +9,20 @@ const MS_PER_SECOND = 1000;
 let startTime;
 let timerInterval;
 let correctAnswers = 0;
-const totalAnswers = MAX_NUMBER * MAX_NUMBER;
+const totalAnswers = GRID_SIZE * GRID_SIZE;
+
+// Create grid cells dynamically
+function createGrid(gridSize) {
+    app.innerHTML = '';
+    const totalCells = gridSize * gridSize;
+    for (let i = 0; i < totalCells; i++) {
+        const cell = document.createElement('div');
+        app.appendChild(cell);
+    }
+}
+
+// Initialize grid on page load
+createGrid(GRID_SIZE + 1);
 
 function generateShuffledNumbers(maxNumber) {
     const numbers = [];
@@ -56,7 +55,7 @@ function startTimer() {
 function stopTimer() {
     if (timerInterval) {
         clearInterval(timerInterval);
-    }
+    }MAX_NUMBER
 }
 
 function onStartClick() {
@@ -69,29 +68,30 @@ function onStartClick() {
     cells[0].textContent = 'X';
 
     // Assign unique random numbers to the top row (skip first column)
-    const topRowNumbers = generateShuffledNumbers(MAX_NUMBER);
-    for (let i = 1; i < GRID_SIZE; i++) {
+    const topRowNumbers = generateShuffledNumbers(GRID_SIZE);
+    for (let i = 1; i <= GRID_SIZE; i++) {
         cells[i].textContent = topRowNumbers[i - 1];
     }
 
     // Assign unique random numbers to the first column (skip first row)
-    const firstColumnNumbers = generateShuffledNumbers(MAX_NUMBER);
-    for (let i = 1; i < GRID_SIZE; i++) {
-        cells[i * GRID_SIZE].textContent = firstColumnNumbers[i - 1];
+    const firstColumnNumbers = generateShuffledNumbers(GRID_SIZE);
+    for (let i = 1; i <= GRID_SIZE; i++) {
+        cells[i * (GRID_SIZE + 1)].textContent = firstColumnNumbers[i - 1];
     }
 
     // Add input fields to cells not in the first row or first column
-    for (let row = 1; row < GRID_SIZE; row++) {
-        for (let col = 1; col < GRID_SIZE; col++) {
-            const index = row * GRID_SIZE + col;
+    for (let row = 1; row <= GRID_SIZE; row++) {
+        for (let col = 1; col <= GRID_SIZE; col++) {
+            const index = (row) * (GRID_SIZE + 1) + col;
             const input = document.createElement('input');
             input.type = 'text';
 
+            const rowValue = parseInt(cells[row * (GRID_SIZE + 1)].textContent);
+            const columnValue = parseInt(cells[col].textContent);
+
             // Add input event listener to validate
             input.addEventListener('input', (e) => {
-                const rowNum = parseInt(cells[row * GRID_SIZE].textContent);
-                const colNum = parseInt(cells[col].textContent);
-                const expectedResult = rowNum * colNum;
+                const expectedResult = rowValue * columnValue;
                 const userInput = parseInt(e.target.value);
 
                 const wasCorrect = e.target.style.color === 'green';
@@ -115,8 +115,22 @@ function onStartClick() {
                 }
             });
 
-            cells[index].innerHTML = '';
+            //cells[index].innerHTML = '';
             cells[index].appendChild(input);
         }
     }
 }
+
+export {
+    generateShuffledNumbers,
+    startTimer,
+    stopTimer,
+    GRID_SIZE,
+    TIMER_UPDATE_INTERVAL,
+    SECONDS_PER_MINUTE,
+    MS_PER_SECOND,
+    totalAnswers
+};
+
+// Expose to global scope for inline onclick handler
+window.onStartClick = onStartClick;

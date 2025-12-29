@@ -5,7 +5,6 @@
 import {
     generateShuffledNumbers,
     GRID_SIZE,
-    MAX_NUMBER,
     TIMER_UPDATE_INTERVAL,
     SECONDS_PER_MINUTE,
     MS_PER_SECOND,
@@ -63,7 +62,7 @@ describe('Math Grid Application', () => {
 
             expect(minutes).toBe(2);
             expect(seconds).toBe(5);
-        });
+        });    MAX_NUMBER,
 
         test('should calculate elapsed seconds from milliseconds', () => {
             const milliseconds = 5500;
