@@ -12,7 +12,6 @@ export {
 
 const timerDiv = document.getElementById('timer');
 const app = document.getElementById('app');
-const startButton = document.getElementById('start');
 
 const GRID_SIZE = 13;
 const MAX_NUMBER = 12;

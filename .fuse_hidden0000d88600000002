@@ -9,7 +9,7 @@
 </head>
 <body>
     <div id="timer"></div>
-    <button id="start">Start</button>
+    <button id="start" onclick="onStartClick()">Start</button>
     <div id="app">
         <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
         <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
