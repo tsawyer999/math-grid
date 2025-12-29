@@ -1,3 +1,15 @@
+export {
+    generateShuffledNumbers,
+    startTimer,
+    stopTimer,
+    GRID_SIZE,
+    MAX_NUMBER,
+    TIMER_UPDATE_INTERVAL,
+    SECONDS_PER_MINUTE,
+    MS_PER_SECOND,
+    totalAnswers
+};
+
 const startButton = document.getElementById('start');
 const timerDiv = document.getElementById('timer');
 const app = document.getElementById('app');
@@ -13,9 +25,9 @@ let timerInterval;
 let correctAnswers = 0;
 const totalAnswers = MAX_NUMBER * MAX_NUMBER;
 
-function generateShuffledNumbers() {
+function generateShuffledNumbers(maxNumber) {
     const numbers = [];
-    for (let i = 1; i <= MAX_NUMBER; i++) {
+    for (let i = 1; i <= maxNumber; i++) {
         numbers.push(i);
     }
     // Shuffle array
@@ -46,29 +58,29 @@ function stopTimer() {
         clearInterval(timerInterval);
     }
 }
-/*
+
 startButton.addEventListener('click', () => {
     correctAnswers = 0;
     startTimer();
 
     const cells = app.querySelectorAll('div');
 
-    // Set first cell to 'X'
+    // Set the first cell to 'X'
     cells[0].textContent = 'X';
 
-    // Assign unique random numbers to top row (skip first column)
-    const topRowNumbers = generateShuffledNumbers();
+    // Assign unique random numbers to the top row (skip first column)
+    const topRowNumbers = generateShuffledNumbers(MAX_NUMBER);
     for (let i = 1; i < GRID_SIZE; i++) {
         cells[i].textContent = topRowNumbers[i - 1];
     }
 
-    // Assign unique random numbers to first column (skip first row)
-    const firstColumnNumbers = generateShuffledNumbers();
+    // Assign unique random numbers to the first column (skip first row)
+    const firstColumnNumbers = generateShuffledNumbers(MAX_NUMBER);
     for (let i = 1; i < GRID_SIZE; i++) {
         cells[i * GRID_SIZE].textContent = firstColumnNumbers[i - 1];
     }
 
-    // Add input fields to cells not in first row or first column
+    // Add input fields to cells not in the first row or first column
     for (let row = 1; row < GRID_SIZE; row++) {
         for (let col = 1; col < GRID_SIZE; col++) {
             const index = row * GRID_SIZE + col;
@@ -108,16 +120,3 @@ startButton.addEventListener('click', () => {
         }
     }
 });
-*/
-// Export for testing
-export {
-    generateShuffledNumbers,
-    startTimer,
-    stopTimer,
-    GRID_SIZE,
-    MAX_NUMBER,
-    TIMER_UPDATE_INTERVAL,
-    SECONDS_PER_MINUTE,
-    MS_PER_SECOND,
-    totalAnswers
-};

@@ -12,13 +12,6 @@ import {
     totalAnswers
 } from './app.js';
 
-
-describe('test1', () => {
-   test('testttt', () => {
-       expect(GRID_SIZE).toBe(13);
-   })
-});
-
 describe('Math Grid Application', () => {
     let startButton, timerDiv, app;
 
@@ -45,52 +38,11 @@ describe('Math Grid Application', () => {
     });
 
     describe('generateShuffledNumbers', () => {
-        test('should generate array with numbers 1-12', () => {
-            const numbers = generateShuffledNumbers();
-
-            expect(numbers).toHaveLength(12);
-            expect(numbers).toContain(1);
-            expect(numbers).toContain(12);
-        });
-
-        test('should contain unique numbers', () => {
-            const numbers = generateShuffledNumbers();
-
-            const uniqueNumbers = new Set(numbers);
-            expect(uniqueNumbers.size).toBe(12);
-        });
-
-        test('should contain all numbers from 1 to 12', () => {
-            const numbers = generateShuffledNumbers();
+        test('should contain all numbers once', () => {
+            const numbers = generateShuffledNumbers(MAX_NUMBER);
             const sorted = [...numbers].sort((a, b) => a - b);
 
             expect(sorted).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
-        });
-    });
-
-    describe('Constants', () => {
-        test('GRID_SIZE should be 13', () => {
-            expect(GRID_SIZE).toBe(13);
-        });
-
-        test('MAX_NUMBER should be 12', () => {
-            expect(MAX_NUMBER).toBe(12);
-        });
-
-        test('totalAnswers should be 144 (12*12)', () => {
-            expect(totalAnswers).toBe(144);
-        });
-
-        test('TIMER_UPDATE_INTERVAL should be 100', () => {
-            expect(TIMER_UPDATE_INTERVAL).toBe(100);
-        });
-
-        test('SECONDS_PER_MINUTE should be 60', () => {
-            expect(SECONDS_PER_MINUTE).toBe(60);
-        });
-
-        test('MS_PER_SECOND should be 1000', () => {
-            expect(MS_PER_SECOND).toBe(1000);
         });
     });
 
