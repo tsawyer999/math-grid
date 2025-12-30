@@ -3,7 +3,6 @@ const SECONDS_PER_MINUTE = 60;
 const MS_PER_SECOND = 1000;
 
 const timerDiv = document.getElementById('timer');
-const gridSizeInput = document.getElementById('gridSize');
 
 const operations = {
     addition: "addition",
@@ -65,10 +64,11 @@ function generateShuffledNumbers(maxNumber) {
 }
 
 /**
+ * @param {number} startInitialTime
  * @returns {void}
  */
-function startTimer() {
-    startTime = Date.now();
+function startTimer(startInitialTime) {
+    startTime = startInitialTime;
 
     if (timerInterval) {
         clearInterval(timerInterval);
@@ -209,6 +209,7 @@ function populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers, operat
 
                 const expectedResult = calculateExpectedResult(rowValue, columnValue, operationId);
                 onInputChange(e.target, expectedResult, totalAnswers);
+                saveCells(cells, correctAnswers);
             });
 
             const index = (row) * (gridSize + 1) + col;
@@ -218,39 +219,76 @@ function populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers, operat
 }
 
 async function loadData() {
+    const appElementId = localStorage.getItem('appElementId');
     const operationId = localStorage.getItem('operation');
-    const startTime = localStorage.getItem('startTime');
+    const startTimeValue = localStorage.getItem('startTime');
     const stopTime = localStorage.getItem('stopTime');
-    const correctAnswers = localStorage.getItem('correctAnswers');
-    const gridSize = localStorage.getItem('gridSize');
+    const correctAnswersValue = localStorage.getItem('correctAnswers');
+    const gridSizeValue = localStorage.getItem('gridSize');
+    const cellValuesValue = localStorage.getItem('cellValues');
+
+    if (!(!!appElementId &&
+        !!operationId &&
+        !!startTimeValue &&
+        !!correctAnswersValue &&
+        !!gridSizeValue &&
+        !!cellValuesValue)) {
+        return;
+    }
+
 
     console.log({
+        appElementId,
         operationId,
-        startTime,
+        startTimeValue,
         stopTime,
         correctAnswers,
-        gridSize
+        gridSizeValue,
+        cellValuesValue
     });
 
-    if (!!operationId && !!startTime && !!correctAnswers && !!gridSize) {
-        console.log("GOOD");
+    const app = document.getElementById(appElementId);
+    app.classList.add('visible');
+    const gridSize = parseInt(gridSizeValue);
+    const gridSizeInput = document.getElementById('gridSize');
+    gridSizeInput.value = gridSize;
+
+    const cellValues = cellValuesValue.split(';');
+    const cells = createBlankGrid(app, gridSize + 1);
+    for (let i = 0; i < cellValues.length; i++) {
+        cells[i].innerText = cellValues[i];
     }
-    else
-    {
-        console.log("BAD");
-    }
+
+    createCornerHeader(cells, operationId);
+    const startTime = parseInt(startTimeValue);
+    startTimer(startTime);
+    correctAnswers = parseInt(correctAnswersValue);
 }
 
 /**
+ * @param {string} appElementId
  * @param {string} operationId
  * @param {number} gridSize
  * @returns {void}
  */
-function saveData(operationId, gridSize) {
+function saveData(appElementId, operationId, gridSize) {
+    localStorage.setItem('appElementId', appElementId);
     localStorage.setItem('operation', operationId);
     localStorage.setItem('startTime', String(startTime));
     localStorage.setItem('correctAnswers', String(correctAnswers));
     localStorage.setItem('gridSize', String(gridSize));
+}
+
+/**
+ * @param {HTMLElement[]} cells
+ * @param {number} correctAnswers
+ * @returns {void}
+ */
+function saveCells(cells, correctAnswers) {
+    const cellValues = cells.map(cell => cell.innerText).join(";");
+    console.log(cellValues);
+    localStorage.setItem('cellValues', String(cellValues));
+    localStorage.setItem('correctAnswers', String(correctAnswers));
 }
 
 /**
@@ -261,6 +299,7 @@ function saveData(operationId, gridSize) {
 function onStartClick(appElementId, operationId) {
     correctAnswers = 0;
 
+    const gridSizeInput = document.getElementById('gridSize');
     const gridSize = parseInt(gridSizeInput.value);
 
     const app = document.getElementById(appElementId);
@@ -275,9 +314,9 @@ function onStartClick(appElementId, operationId) {
 
     populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers, operationId);
 
-    startTimer();
+    startTimer(Date.now());
 
-    void saveData(operationId, gridSize);
+    void saveData(appElementId, operationId, gridSize);
 }
 
 export {
