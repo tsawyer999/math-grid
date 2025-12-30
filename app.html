@@ -8,8 +8,12 @@
     <script type="module" src="app.js"></script>
 </head>
 <body>
+    <div class="controls">
+        <label for="gridSize">Grid Size:</label>
+        <input type="number" id="gridSize" value="12" min="1" max="20">
+        <button id="start" onclick="onStartClick()">Start</button>
+    </div>
     <div id="timer"></div>
-    <button id="start" onclick="onStartClick()">Start</button>
     <div id="app" class="app"></div>
 </body>
 </html>

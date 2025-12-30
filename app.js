@@ -1,9 +1,10 @@
-const GRID_SIZE = 2;
+const GRID_SIZE = 3;
 const TIMER_UPDATE_INTERVAL = 100;
 const SECONDS_PER_MINUTE = 60;
 const MS_PER_SECOND = 1000;
 
 const timerDiv = document.getElementById('timer');
+const gridSizeInput = document.getElementById('gridSize');
 
 let startTime;
 let timerInterval;
@@ -58,7 +59,7 @@ function stopTimer() {
     }
 }
 
-function validateInput(input, expectedResult) {
+function validateInput(input, expectedResult, totalAnswers) {
     const userInput = parseInt(input.value);
     const wasCorrect = input.classList.contains('correct');
 
@@ -69,7 +70,7 @@ function validateInput(input, expectedResult) {
             correctAnswers++;
         }
 
-        if (correctAnswers === GRID_SIZE * GRID_SIZE) {
+        if (correctAnswers === totalAnswers) {
             stopTimer();
         }
     } else {
@@ -86,36 +87,36 @@ function createCornerHeader(cells) {
     cells[0].textContent = 'X';
 }
 
-function createRowHeader(cells) {
-    const topRowNumbers = generateShuffledNumbers(GRID_SIZE);
-    for (let i = 1; i <= GRID_SIZE; i++) {
+function createRowHeader(cells, gridSize) {
+    const topRowNumbers = generateShuffledNumbers(gridSize);
+    for (let i = 1; i <= gridSize; i++) {
         cells[i].classList.add('grid-header');
         cells[i].textContent = topRowNumbers[i - 1];
     }
 }
 
-function createColumnHeader(cells) {
-    const firstColumnNumbers = generateShuffledNumbers(GRID_SIZE);
-    for (let i = 1; i <= GRID_SIZE; i++) {
-        const index = i * (GRID_SIZE + 1);
+function createColumnHeader(cells, gridSize) {
+    const firstColumnNumbers = generateShuffledNumbers(gridSize);
+    for (let i = 1; i <= gridSize; i++) {
+        const index = i * (gridSize + 1);
         cells[index].classList.add('grid-header');
         cells[index].textContent = firstColumnNumbers[i - 1];
     }
 }
 
-function populateGrid(cells) {
-    for (let row = 1; row <= GRID_SIZE; row++) {
-        for (let col = 1; col <= GRID_SIZE; col++) {
+function populateGrid(cells, gridSize, totalAnswers) {
+    for (let row = 1; row <= gridSize; row++) {
+        for (let col = 1; col <= gridSize; col++) {
             const input = document.createElement('input');
             input.type = 'text';
             input.addEventListener('input', (e) => {
-                const rowValue = parseInt(cells[row * (GRID_SIZE + 1)].textContent);
+                const rowValue = parseInt(cells[row * (gridSize + 1)].textContent);
                 const columnValue = parseInt(cells[col].textContent);
                 const expectedResult = rowValue * columnValue;
-                validateInput(e.target, expectedResult);
+                validateInput(e.target, expectedResult, totalAnswers);
             });
 
-            const index = (row) * (GRID_SIZE + 1) + col;
+            const index = (row) * (gridSize + 1) + col;
             cells[index].appendChild(input);
         }
     }
@@ -124,14 +125,18 @@ function populateGrid(cells) {
 function onStartClick() {
     correctAnswers = 0;
 
+    const gridSize = parseInt(gridSizeInput.value) || GRID_SIZE;
+    const totalAnswers = gridSize * gridSize;
+
     const app = document.getElementById('app');
-    const cells = createBlankGrid(app, GRID_SIZE + 1);
+    app.classList.add('visible');
+    const cells = createBlankGrid(app, gridSize + 1);
 
     createCornerHeader(cells);
-    createRowHeader(cells);
-    createColumnHeader(cells);
+    createRowHeader(cells, gridSize);
+    createColumnHeader(cells, gridSize);
 
-    populateGrid(cells);
+    populateGrid(cells, gridSize, totalAnswers);
 
     startTimer();
 }
