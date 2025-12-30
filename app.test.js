@@ -38,7 +38,7 @@ describe('Math Grid Application', () => {
 
     describe('generateShuffledNumbers', () => {
         test('should contain all numbers once', () => {
-            const numbers = generateShuffledNumbers(MAX_NUMBER);
+            const numbers = generateShuffledNumbers(12);
             const sorted = [...numbers].sort((a, b) => a - b);
 
             expect(sorted).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
@@ -62,7 +62,7 @@ describe('Math Grid Application', () => {
 
             expect(minutes).toBe(2);
             expect(seconds).toBe(5);
-        });    MAX_NUMBER,
+        });
 
         test('should calculate elapsed seconds from milliseconds', () => {
             const milliseconds = 5500;
