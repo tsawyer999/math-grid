@@ -14,6 +14,11 @@ let startTime;
 let timerInterval;
 let correctAnswers = 0;
 
+/**
+ * @param {HTMLElement} app
+ * @param {number} gridSize
+ * @returns {HTMLElement[]}
+ */
 function createBlankGrid(app, gridSize) {
     app.innerHTML = '';
     app.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
@@ -29,6 +34,10 @@ function createBlankGrid(app, gridSize) {
     return cells;
 }
 
+/**
+ * @param {number} maxNumber
+ * @returns {number[]}
+ */
 function generateShuffledNumbers(maxNumber) {
     const numbers = [];
     for (let i = 1; i <= maxNumber; i++) {
@@ -42,6 +51,9 @@ function generateShuffledNumbers(maxNumber) {
     return numbers;
 }
 
+/**
+ * @returns {void}
+ */
 function startTimer() {
     startTime = Date.now();
 
@@ -57,12 +69,21 @@ function startTimer() {
     }, TIMER_UPDATE_INTERVAL);
 }
 
+/**
+ * @returns {void}
+ */
 function stopTimer() {
     if (timerInterval) {
         clearInterval(timerInterval);
     }
 }
 
+    /**
+ * @param {number} rowValue
+ * @param {number} columnValue
+ * @param {string} operationId
+ * @returns {number}
+ */
 function calculateExpectedResult(rowValue, columnValue, operationId) {
     if (operationId === operations.addition) {
         return rowValue + columnValue;
@@ -73,6 +94,12 @@ function calculateExpectedResult(rowValue, columnValue, operationId) {
     }
 }
 
+/**
+ * @param {HTMLInputElement} input
+ * @param {number} expectedResult
+ * @param {number} totalAnswers
+ * @returns {void}
+ */
 function validateInput(input, expectedResult, totalAnswers) {
     const userInput = parseInt(input.value);
     const wasCorrect = input.classList.contains('correct');
@@ -96,6 +123,11 @@ function validateInput(input, expectedResult, totalAnswers) {
     }
 }
 
+/**
+ * @param {HTMLElement[]} cells
+ * @param {string} operationId
+ * @returns {void}
+ */
 function createCornerHeader(cells, operationId) {
     cells[0].classList.add('grid-header');
 
@@ -110,27 +142,45 @@ function createCornerHeader(cells, operationId) {
     }
 }
 
+/**
+ * @param {HTMLElement[]} cells
+ * @param {number} gridSize
+ * @returns {number[]}
+ */
 function createRowHeader(cells, gridSize) {
     const topRowNumbers = generateShuffledNumbers(gridSize);
     for (let i = 1; i <= gridSize; i++) {
         cells[i].classList.add('grid-header');
-        cells[i].textContent = topRowNumbers[i - 1];
+        cells[i].textContent = String(topRowNumbers[i - 1]);
     }
 
     return topRowNumbers;
 }
 
+/**
+ * @param {HTMLElement[]} cells
+ * @param {number} gridSize
+ * @returns {number[]}
+ */
 function createColumnHeader(cells, gridSize) {
     const firstColumnNumbers = generateShuffledNumbers(gridSize);
     for (let i = 1; i <= gridSize; i++) {
         const index = i * (gridSize + 1);
         cells[index].classList.add('grid-header');
-        cells[index].textContent = firstColumnNumbers[i - 1];
+        cells[index].textContent = String(firstColumnNumbers[i - 1]);
     }
 
     return firstColumnNumbers;
 }
 
+/**
+ * @param {HTMLElement[]} cells
+ * @param {number} gridSize
+ * @param {number[]} topRowNumbers
+ * @param {number[]} firstColumnNumbers
+ * @param {string} operationId
+ * @returns {void}
+ */
 function populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers, operationId) {
     const totalAnswers = gridSize * gridSize;
 
@@ -152,6 +202,11 @@ function populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers, operat
     }
 }
 
+/**
+ * @param {string} appElementId
+ * @param {string} operationId
+ * @returns {void}
+ */
 function onStartClick(appElementId, operationId) {
     correctAnswers = 0;
 
