@@ -94,16 +94,18 @@ function onStartClick() {
                 const expectedResult = rowValue * columnValue;
                 const userInput = parseInt(e.target.value);
 
-                const wasCorrect = e.target.style.color === 'green';
+                const wasCorrect = e.target.classList.contains('correct');
                 const isCorrect = userInput === expectedResult;
 
                 if (isCorrect) {
-                    e.target.style.color = 'green';
+                    e.target.classList.add('correct');
+                    e.target.classList.remove('incorrect');
                     if (!wasCorrect) {
                         correctAnswers++;
                     }
                 } else {
-                    e.target.style.color = 'red';
+                    e.target.classList.add('incorrect');
+                    e.target.classList.remove('correct');
                     if (wasCorrect) {
                         correctAnswers--;
                     }
