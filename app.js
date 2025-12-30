@@ -103,17 +103,7 @@ function createColumnHeader(cells) {
     }
 }
 
-function onStartClick() {
-    correctAnswers = 0;
-    const app = document.getElementById('app');
-
-    const cells = createBlankGrid(app, GRID_SIZE + 1);
-
-    createCornerHeader(cells);
-    createRowHeader(cells);
-    createColumnHeader(cells);
-
-    // Add input fields to cells not in the first row or first column
+function populateGrid(cells) {
     for (let row = 1; row <= GRID_SIZE; row++) {
         for (let col = 1; col <= GRID_SIZE; col++) {
             const input = document.createElement('input');
@@ -129,6 +119,19 @@ function onStartClick() {
             cells[index].appendChild(input);
         }
     }
+}
+
+function onStartClick() {
+    correctAnswers = 0;
+
+    const app = document.getElementById('app');
+    const cells = createBlankGrid(app, GRID_SIZE + 1);
+
+    createCornerHeader(cells);
+    createRowHeader(cells);
+    createColumnHeader(cells);
+
+    populateGrid(cells);
 
     startTimer();
 }
