@@ -5,6 +5,11 @@ const MS_PER_SECOND = 1000;
 const timerDiv = document.getElementById('timer');
 const gridSizeInput = document.getElementById('gridSize');
 
+const operations = {
+    addition: "addition",
+    multiplication: "multiplication"
+};
+
 let startTime;
 let timerInterval;
 let correctAnswers = 0;
@@ -58,6 +63,16 @@ function stopTimer() {
     }
 }
 
+function calculateExpectedResult(rowValue, columnValue, operationId) {
+    if (operationId === operations.addition) {
+        return rowValue + columnValue;
+    } else if (operationId === operations.multiplication) {
+        return rowValue * columnValue;
+    } else {
+        throw new Error(`Invalid operation ID: ${operationId}`);
+    }
+}
+
 function validateInput(input, expectedResult, totalAnswers) {
     const userInput = parseInt(input.value);
     const wasCorrect = input.classList.contains('correct');
@@ -84,11 +99,14 @@ function validateInput(input, expectedResult, totalAnswers) {
 function createCornerHeader(cells, operationId) {
     cells[0].classList.add('grid-header');
 
-    if (operationId === 'addition') {
+    if (operationId === operations.addition) {
         cells[0].textContent = '+';
     }
-    else if (operationId === 'multiplication') {
+    else if (operationId === operations.multiplication) {
         cells[0].textContent = 'x';
+    }
+    else {
+        throw new Error(`Invalid operation ID: ${operationId}`);
     }
 }
 
@@ -124,9 +142,7 @@ function populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers, operat
                 const rowValue = firstColumnNumbers[row - 1];
                 const columnValue = topRowNumbers[col - 1];
 
-                const expectedResult = operationId === 'addition'
-                ? rowValue + columnValue
-                : rowValue * columnValue;
+                const expectedResult = calculateExpectedResult(rowValue, columnValue, operationId);
                 validateInput(e.target, expectedResult, totalAnswers);
             });
 
@@ -165,5 +181,5 @@ export {
     MS_PER_SECOND
 };
 
-// Expose to global scope for inline onclick handler
+window.operations = operations;
 window.onStartClick = onStartClick;
