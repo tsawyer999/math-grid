@@ -93,6 +93,8 @@ function createRowHeader(cells, gridSize) {
         cells[i].classList.add('grid-header');
         cells[i].textContent = topRowNumbers[i - 1];
     }
+
+    return topRowNumbers;
 }
 
 function createColumnHeader(cells, gridSize) {
@@ -102,16 +104,20 @@ function createColumnHeader(cells, gridSize) {
         cells[index].classList.add('grid-header');
         cells[index].textContent = firstColumnNumbers[i - 1];
     }
+
+    return firstColumnNumbers;
 }
 
-function populateGrid(cells, gridSize, totalAnswers) {
+function populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers) {
+    const totalAnswers = gridSize * gridSize;
+
     for (let row = 1; row <= gridSize; row++) {
         for (let col = 1; col <= gridSize; col++) {
             const input = document.createElement('input');
             input.type = 'text';
             input.addEventListener('input', (e) => {
-                const rowValue = parseInt(cells[row * (gridSize + 1)].textContent);
-                const columnValue = parseInt(cells[col].textContent);
+                const rowValue = firstColumnNumbers[row - 1];
+                const columnValue = topRowNumbers[col - 1];
                 const expectedResult = rowValue * columnValue;
                 validateInput(e.target, expectedResult, totalAnswers);
             });
@@ -126,17 +132,17 @@ function onStartClick() {
     correctAnswers = 0;
 
     const gridSize = parseInt(gridSizeInput.value) || GRID_SIZE;
-    const totalAnswers = gridSize * gridSize;
 
     const app = document.getElementById('app');
     app.classList.add('visible');
     const cells = createBlankGrid(app, gridSize + 1);
 
     createCornerHeader(cells);
-    createRowHeader(cells, gridSize);
-    createColumnHeader(cells, gridSize);
 
-    populateGrid(cells, gridSize, totalAnswers);
+    const topRowNumbers = createRowHeader(cells, gridSize);
+    const firstColumnNumbers = createColumnHeader(cells, gridSize);
+
+    populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers);
 
     startTimer();
 }
