@@ -1,25 +1,27 @@
-const timerDiv = document.getElementById('timer');
-const app = document.getElementById('app');
-
 const GRID_SIZE = 2;
 const TIMER_UPDATE_INTERVAL = 100;
 const SECONDS_PER_MINUTE = 60;
 const MS_PER_SECOND = 1000;
 
+const timerDiv = document.getElementById('timer');
+
 let startTime;
 let timerInterval;
 let correctAnswers = 0;
-const totalAnswers = GRID_SIZE * GRID_SIZE;
 
-// Create grid cells dynamically
-function createBlankGrid(gridSize) {
+function createBlankGrid(app, gridSize) {
     app.innerHTML = '';
     app.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+
+    const cells = [];
     const totalCells = gridSize * gridSize;
     for (let i = 0; i < totalCells; i++) {
         const cell = document.createElement('div');
         app.appendChild(cell);
+        cells.push(cell);
     }
+
+    return cells;
 }
 
 function generateShuffledNumbers(maxNumber) {
@@ -27,7 +29,7 @@ function generateShuffledNumbers(maxNumber) {
     for (let i = 1; i <= maxNumber; i++) {
         numbers.push(i);
     }
-    // Shuffle array
+
     for (let i = numbers.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
@@ -59,13 +61,16 @@ function stopTimer() {
 function validateInput(input, expectedResult) {
     const userInput = parseInt(input.value);
     const wasCorrect = input.classList.contains('correct');
-    const isCorrect = userInput === expectedResult;
 
-    if (isCorrect) {
+    if (userInput === expectedResult) {
         input.classList.add('correct');
         input.classList.remove('incorrect');
         if (!wasCorrect) {
             correctAnswers++;
+        }
+
+        if (correctAnswers === GRID_SIZE * GRID_SIZE) {
+            stopTimer();
         }
     } else {
         input.classList.add('incorrect');
@@ -73,11 +78,6 @@ function validateInput(input, expectedResult) {
         if (wasCorrect) {
             correctAnswers--;
         }
-    }
-
-    // Check if all answers are correct
-    if (correctAnswers === totalAnswers) {
-        stopTimer();
     }
 }
 
@@ -104,10 +104,10 @@ function createColumnHeader(cells) {
 }
 
 function onStartClick() {
-    createBlankGrid(GRID_SIZE + 1);
     correctAnswers = 0;
+    const app = document.getElementById('app');
 
-    const cells = app.querySelectorAll('div');
+    const cells = createBlankGrid(app, GRID_SIZE + 1);
 
     createCornerHeader(cells);
     createRowHeader(cells);
@@ -140,8 +140,7 @@ export {
     GRID_SIZE,
     TIMER_UPDATE_INTERVAL,
     SECONDS_PER_MINUTE,
-    MS_PER_SECOND,
-    totalAnswers
+    MS_PER_SECOND
 };
 
 // Expose to global scope for inline onclick handler
