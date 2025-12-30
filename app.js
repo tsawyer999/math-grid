@@ -1,7 +1,7 @@
 const timerDiv = document.getElementById('timer');
 const app = document.getElementById('app');
 
-const GRID_SIZE = 12;
+const GRID_SIZE = 2;
 const TIMER_UPDATE_INTERVAL = 100;
 const SECONDS_PER_MINUTE = 60;
 const MS_PER_SECOND = 1000;
@@ -12,17 +12,15 @@ let correctAnswers = 0;
 const totalAnswers = GRID_SIZE * GRID_SIZE;
 
 // Create grid cells dynamically
-function createGrid(gridSize) {
+function createBlankGrid(gridSize) {
     app.innerHTML = '';
+    app.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
     const totalCells = gridSize * gridSize;
     for (let i = 0; i < totalCells; i++) {
         const cell = document.createElement('div');
         app.appendChild(cell);
     }
 }
-
-// Initialize grid on page load
-createGrid(GRID_SIZE + 1);
 
 function generateShuffledNumbers(maxNumber) {
     const numbers = [];
@@ -55,72 +53,84 @@ function startTimer() {
 function stopTimer() {
     if (timerInterval) {
         clearInterval(timerInterval);
-    }MAX_NUMBER
+    }
+}
+
+function validateInput(input, expectedResult) {
+    const userInput = parseInt(input.value);
+    const wasCorrect = input.classList.contains('correct');
+    const isCorrect = userInput === expectedResult;
+
+    if (isCorrect) {
+        input.classList.add('correct');
+        input.classList.remove('incorrect');
+        if (!wasCorrect) {
+            correctAnswers++;
+        }
+    } else {
+        input.classList.add('incorrect');
+        input.classList.remove('correct');
+        if (wasCorrect) {
+            correctAnswers--;
+        }
+    }
+
+    // Check if all answers are correct
+    if (correctAnswers === totalAnswers) {
+        stopTimer();
+    }
+}
+
+function createCornerHeader(cells) {
+    cells[0].classList.add('grid-header');
+    cells[0].textContent = 'X';
+}
+
+function createRowHeader(cells) {
+    const topRowNumbers = generateShuffledNumbers(GRID_SIZE);
+    for (let i = 1; i <= GRID_SIZE; i++) {
+        cells[i].classList.add('grid-header');
+        cells[i].textContent = topRowNumbers[i - 1];
+    }
+}
+
+function createColumnHeader(cells) {
+    const firstColumnNumbers = generateShuffledNumbers(GRID_SIZE);
+    for (let i = 1; i <= GRID_SIZE; i++) {
+        const index = i * (GRID_SIZE + 1);
+        cells[index].classList.add('grid-header');
+        cells[index].textContent = firstColumnNumbers[i - 1];
+    }
 }
 
 function onStartClick() {
+    createBlankGrid(GRID_SIZE + 1);
     correctAnswers = 0;
-    startTimer();
 
     const cells = app.querySelectorAll('div');
 
-    // Set the first cell to 'X'
-    cells[0].textContent = 'X';
-
-    // Assign unique random numbers to the top row (skip first column)
-    const topRowNumbers = generateShuffledNumbers(GRID_SIZE);
-    for (let i = 1; i <= GRID_SIZE; i++) {
-        cells[i].textContent = topRowNumbers[i - 1];
-    }
-
-    // Assign unique random numbers to the first column (skip first row)
-    const firstColumnNumbers = generateShuffledNumbers(GRID_SIZE);
-    for (let i = 1; i <= GRID_SIZE; i++) {
-        cells[i * (GRID_SIZE + 1)].textContent = firstColumnNumbers[i - 1];
-    }
+    createCornerHeader(cells);
+    createRowHeader(cells);
+    createColumnHeader(cells);
 
     // Add input fields to cells not in the first row or first column
     for (let row = 1; row <= GRID_SIZE; row++) {
         for (let col = 1; col <= GRID_SIZE; col++) {
-            const index = (row) * (GRID_SIZE + 1) + col;
             const input = document.createElement('input');
             input.type = 'text';
-
-            const rowValue = parseInt(cells[row * (GRID_SIZE + 1)].textContent);
-            const columnValue = parseInt(cells[col].textContent);
-
-            // Add input event listener to validate
             input.addEventListener('input', (e) => {
+                const rowValue = parseInt(cells[row * (GRID_SIZE + 1)].textContent);
+                const columnValue = parseInt(cells[col].textContent);
                 const expectedResult = rowValue * columnValue;
-                const userInput = parseInt(e.target.value);
-
-                const wasCorrect = e.target.classList.contains('correct');
-                const isCorrect = userInput === expectedResult;
-
-                if (isCorrect) {
-                    e.target.classList.add('correct');
-                    e.target.classList.remove('incorrect');
-                    if (!wasCorrect) {
-                        correctAnswers++;
-                    }
-                } else {
-                    e.target.classList.add('incorrect');
-                    e.target.classList.remove('correct');
-                    if (wasCorrect) {
-                        correctAnswers--;
-                    }
-                }
-
-                // Check if all answers are correct
-                if (correctAnswers === totalAnswers) {
-                    stopTimer();
-                }
+                validateInput(e.target, expectedResult);
             });
 
-            //cells[index].innerHTML = '';
+            const index = (row) * (GRID_SIZE + 1) + col;
             cells[index].appendChild(input);
         }
     }
+
+    startTimer();
 }
 
 export {
