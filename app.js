@@ -226,16 +226,19 @@ async function loadData() {
     const correctAnswersValue = localStorage.getItem('correctAnswers');
     const gridSizeValue = localStorage.getItem('gridSize');
     const cellValuesValue = localStorage.getItem('cellValues');
+    const topRowNumbersValue = localStorage.getItem('topRowNumbers');
+    const firstColumnNumbersValue = localStorage.getItem('firstColumnNumbers');
 
     if (!(!!appElementId &&
         !!operationId &&
         !!startTimeValue &&
         !!correctAnswersValue &&
         !!gridSizeValue &&
-        !!cellValuesValue)) {
+        !!cellValuesValue &&
+        !!topRowNumbersValue &&
+        !!firstColumnNumbersValue)) {
         return;
     }
-
 
     console.log({
         appElementId,
@@ -244,7 +247,9 @@ async function loadData() {
         stopTime,
         correctAnswers,
         gridSizeValue,
-        cellValuesValue
+        cellValuesValue,
+        topRowNumbersValue,
+        firstColumnNumbersValue
     });
 
     const app = document.getElementById(appElementId);
@@ -263,20 +268,29 @@ async function loadData() {
     const startTime = parseInt(startTimeValue);
     startTimer(startTime);
     correctAnswers = parseInt(correctAnswersValue);
+
+    const topRowNumbers = topRowNumbersValue.split(";").map(Number);
+    const firstColumnNumbers = firstColumnNumbersValue.split(";").map(Number);
+
+    populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers, operationId);
 }
 
 /**
  * @param {string} appElementId
  * @param {string} operationId
  * @param {number} gridSize
+ * @param {number[]} topRowNumbers
+ * @param {number[]} firstColumnNumbers
  * @returns {void}
  */
-function saveData(appElementId, operationId, gridSize) {
+function saveData(appElementId, operationId, gridSize, topRowNumbers, firstColumnNumbers) {
     localStorage.setItem('appElementId', appElementId);
     localStorage.setItem('operation', operationId);
     localStorage.setItem('startTime', String(startTime));
     localStorage.setItem('correctAnswers', String(correctAnswers));
     localStorage.setItem('gridSize', String(gridSize));
+    localStorage.setItem('topRowNumbers', topRowNumbers.join(";"));
+    localStorage.setItem('firstColumnNumbers', firstColumnNumbers.join(";"));
 }
 
 /**
@@ -316,7 +330,7 @@ function onStartClick(appElementId, operationId) {
 
     startTimer(Date.now());
 
-    void saveData(appElementId, operationId, gridSize);
+    void saveData(appElementId, operationId, gridSize, topRowNumbers, firstColumnNumbers);
 }
 
 export {
