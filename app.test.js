@@ -1,19 +1,10 @@
-/**
- * @jest-environment jsdom
- */
-
 import {
     generateShuffledNumbers,
-    GRID_SIZE,
-    TIMER_UPDATE_INTERVAL,
     SECONDS_PER_MINUTE,
-    MS_PER_SECOND,
-    totalAnswers
+    MS_PER_SECOND
 } from './app.js';
 
 describe('Math Grid Application', () => {
-    let startButton, timerDiv, app;
-
     beforeEach(() => {
         // Setup DOM
         document.body.innerHTML = `

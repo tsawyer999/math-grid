@@ -1,4 +1,3 @@
-const GRID_SIZE = 3;
 const TIMER_UPDATE_INTERVAL = 100;
 const SECONDS_PER_MINUTE = 60;
 const MS_PER_SECOND = 1000;
@@ -49,7 +48,7 @@ function startTimer() {
         const elapsed = Math.floor((Date.now() - startTime) / MS_PER_SECOND);
         const minutes = Math.floor(elapsed / SECONDS_PER_MINUTE);
         const seconds = elapsed % SECONDS_PER_MINUTE;
-        timerDiv.textContent = `${minutes} minutes ${seconds} seconds`;
+        timerDiv.textContent = `${minutes} minutes ${seconds} seconds - ${correctAnswers} correct answers`;
     }, TIMER_UPDATE_INTERVAL);
 }
 
@@ -82,9 +81,15 @@ function validateInput(input, expectedResult, totalAnswers) {
     }
 }
 
-function createCornerHeader(cells) {
+function createCornerHeader(cells, operationId) {
     cells[0].classList.add('grid-header');
-    cells[0].textContent = 'X';
+
+    if (operationId === 'addition') {
+        cells[0].textContent = '+';
+    }
+    else if (operationId === 'multiplication') {
+        cells[0].textContent = 'x';
+    }
 }
 
 function createRowHeader(cells, gridSize) {
@@ -108,7 +113,7 @@ function createColumnHeader(cells, gridSize) {
     return firstColumnNumbers;
 }
 
-function populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers) {
+function populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers, operationId) {
     const totalAnswers = gridSize * gridSize;
 
     for (let row = 1; row <= gridSize; row++) {
@@ -118,7 +123,10 @@ function populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers) {
             input.addEventListener('input', (e) => {
                 const rowValue = firstColumnNumbers[row - 1];
                 const columnValue = topRowNumbers[col - 1];
-                const expectedResult = rowValue * columnValue;
+
+                const expectedResult = operationId === 'addition'
+                ? rowValue + columnValue
+                : rowValue * columnValue;
                 validateInput(e.target, expectedResult, totalAnswers);
             });
 
@@ -128,21 +136,22 @@ function populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers) {
     }
 }
 
-function onStartClick() {
+function onStartClick(appElementId, operationId) {
     correctAnswers = 0;
 
-    const gridSize = parseInt(gridSizeInput.value) || GRID_SIZE;
+    const gridSize = parseInt(gridSizeInput.value);
 
-    const app = document.getElementById('app');
+    const app = document.getElementById(appElementId);
     app.classList.add('visible');
+
     const cells = createBlankGrid(app, gridSize + 1);
 
-    createCornerHeader(cells);
+    createCornerHeader(cells, operationId);
 
     const topRowNumbers = createRowHeader(cells, gridSize);
     const firstColumnNumbers = createColumnHeader(cells, gridSize);
 
-    populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers);
+    populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers, operationId);
 
     startTimer();
 }
@@ -151,7 +160,6 @@ export {
     generateShuffledNumbers,
     startTimer,
     stopTimer,
-    GRID_SIZE,
     TIMER_UPDATE_INTERVAL,
     SECONDS_PER_MINUTE,
     MS_PER_SECOND
