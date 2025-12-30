@@ -10,8 +10,21 @@ const operations = {
     multiplication: "multiplication"
 };
 
+/**
+ * @type {number | undefined}
+ */
 let startTime;
+/**
+ * @type {number | undefined}
+ */
+let stopTime;
+/**
+ * @type {number | undefined}
+ */
 let timerInterval;
+/**
+ * @type {number}
+ */
 let correctAnswers = 0;
 
 /**
@@ -73,6 +86,8 @@ function startTimer() {
  * @returns {void}
  */
 function stopTimer() {
+    stopTime = Date.now();
+    localStorage.setItem('stopTime', String(stopTime));
     if (timerInterval) {
         clearInterval(timerInterval);
     }
@@ -100,7 +115,7 @@ function calculateExpectedResult(rowValue, columnValue, operationId) {
  * @param {number} totalAnswers
  * @returns {void}
  */
-function validateInput(input, expectedResult, totalAnswers) {
+function onInputChange(input, expectedResult, totalAnswers) {
     const userInput = parseInt(input.value);
     const wasCorrect = input.classList.contains('correct');
 
@@ -193,13 +208,49 @@ function populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers, operat
                 const columnValue = topRowNumbers[col - 1];
 
                 const expectedResult = calculateExpectedResult(rowValue, columnValue, operationId);
-                validateInput(e.target, expectedResult, totalAnswers);
+                onInputChange(e.target, expectedResult, totalAnswers);
             });
 
             const index = (row) * (gridSize + 1) + col;
             cells[index].appendChild(input);
         }
     }
+}
+
+async function loadData() {
+    const operationId = localStorage.getItem('operation');
+    const startTime = localStorage.getItem('startTime');
+    const stopTime = localStorage.getItem('stopTime');
+    const correctAnswers = localStorage.getItem('correctAnswers');
+    const gridSize = localStorage.getItem('gridSize');
+
+    console.log({
+        operationId,
+        startTime,
+        stopTime,
+        correctAnswers,
+        gridSize
+    });
+
+    if (!!operationId && !!startTime && !!correctAnswers && !!gridSize) {
+        console.log("GOOD");
+    }
+    else
+    {
+        console.log("BAD");
+    }
+}
+
+/**
+ * @param {string} operationId
+ * @param {number} gridSize
+ * @returns {void}
+ */
+function saveData(operationId, gridSize) {
+    localStorage.setItem('operation', operationId);
+    localStorage.setItem('startTime', String(startTime));
+    localStorage.setItem('correctAnswers', String(correctAnswers));
+    localStorage.setItem('gridSize', String(gridSize));
 }
 
 /**
@@ -225,6 +276,8 @@ function onStartClick(appElementId, operationId) {
     populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers, operationId);
 
     startTimer();
+
+    void saveData(operationId, gridSize);
 }
 
 export {
@@ -238,3 +291,4 @@ export {
 
 window.operations = operations;
 window.onStartClick = onStartClick;
+window.loadData = loadData;
