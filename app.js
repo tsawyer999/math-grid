@@ -25,6 +25,10 @@ let timerInterval;
  * @type {number}
  */
 let correctAnswers = 0;
+/**
+ * @type {number}
+ */
+let totalAnswers = 0;
 
 /**
  * @param {HTMLElement} app
@@ -33,14 +37,39 @@ let correctAnswers = 0;
  */
 function createBlankGrid(app, gridSize) {
     app.innerHTML = '';
-    app.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+    app.style.gridTemplateColumns = `repeat(${gridSize + 1}, 1fr)`;
 
     const cells = [];
-    const totalCells = gridSize * gridSize;
-    for (let i = 0; i < totalCells; i++) {
-        const cell = document.createElement('div');
+    let cell;
+
+    // grid-operator
+    cell = document.createElement('div');
+    cell.classList.add('grid-header');
+    cell.classList.add('grid-operator-header');
+    app.appendChild(cell);
+
+    // col-header
+    for (let i = 0; i < gridSize; i++) {
+        cell = document.createElement('div');
+        cell.classList.add('grid-header');
+        cell.classList.add('grid-column-header');
         app.appendChild(cell);
-        cells.push(cell);
+    }
+
+    for (let i = 0; i < gridSize; i++) {
+
+        // row-header
+        cell = document.createElement('div');
+        cell.classList.add('grid-header');
+        cell.classList.add('grid-row-header');
+        app.appendChild(cell);
+
+        // grid-cell
+        for (let i = 0; i < gridSize; i++) {
+            cell = document.createElement('div');
+            cell.classList.add('grid-cell');
+            app.appendChild(cell);
+        }
     }
 
     return cells;
@@ -139,12 +168,14 @@ function onInputChange(input, expectedResult, totalAnswers) {
 }
 
 /**
- * @param {HTMLElement[]} cells
  * @param {string} operationId
  * @returns {void}
  */
-function createCornerHeader(cells, operationId) {
-    cells[0].classList.add('grid-header');
+function populateOperatorHeader(operationId) {
+    const cells = document.querySelectorAll('.grid-operator-header');
+    if (cells.length === 0) {
+        throw new Error('Grid operator header not found');
+    }
 
     if (operationId === operations.addition) {
         cells[0].textContent = '+';
@@ -158,67 +189,84 @@ function createCornerHeader(cells, operationId) {
 }
 
 /**
- * @param {HTMLElement[]} cells
- * @param {number} gridSize
- * @returns {number[]}
- */
-function createRowHeader(cells, gridSize) {
-    const topRowNumbers = generateShuffledNumbers(gridSize);
-    for (let i = 1; i <= gridSize; i++) {
-        cells[i].classList.add('grid-header');
-        cells[i].textContent = String(topRowNumbers[i - 1]);
-    }
-
-    return topRowNumbers;
-}
-
-/**
- * @param {HTMLElement[]} cells
- * @param {number} gridSize
- * @returns {number[]}
- */
-function createColumnHeader(cells, gridSize) {
-    const firstColumnNumbers = generateShuffledNumbers(gridSize);
-    for (let i = 1; i <= gridSize; i++) {
-        const index = i * (gridSize + 1);
-        cells[index].classList.add('grid-header');
-        cells[index].textContent = String(firstColumnNumbers[i - 1]);
-    }
-
-    return firstColumnNumbers;
-}
-
-/**
- * @param {HTMLElement[]} cells
- * @param {number} gridSize
  * @param {number[]} topRowNumbers
+ * @returns {void}
+ */
+function populateRowHeader(topRowNumbers) {
+    const cells = document.querySelectorAll('.grid-row-header');
+    for (let i = 0; i < topRowNumbers.length; i++) {
+        cells[i].textContent = String(topRowNumbers[i]);
+    }
+}
+
+/**
  * @param {number[]} firstColumnNumbers
+ * @returns {void}
+ */
+function populateColumnHeader(firstColumnNumbers) {
+    const cells = document.querySelectorAll('.grid-column-header');
+    for (let i = 0; i < firstColumnNumbers.length; i++) {
+        cells[i].textContent = String(firstColumnNumbers[i]);
+    }
+}
+
+/**
+ * @param {string[]} cellValues
+ * @param {int} gridSize
+ * @param {int[]} rowNumbers
+ * @param {int[]} columnNumbers
  * @param {string} operationId
  * @returns {void}
  */
-function populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers, operationId) {
-    const totalAnswers = gridSize * gridSize;
+function populateGrid(cellValues, gridSize, rowNumbers, columnNumbers, operationId) {
+    populateOperatorHeader(operationId);
+    populateRowHeader(rowNumbers);
+    populateColumnHeader(columnNumbers);
+    populateValues(cellValues, gridSize, rowNumbers, columnNumbers, operationId);
+}
 
-    for (let row = 1; row <= gridSize; row++) {
-        for (let col = 1; col <= gridSize; col++) {
+/**
+ * @param {string[]} cellValues
+ * @param {int} gridSize
+ * @param {int[]} rowNumbers
+ * @param {int[]} columnNumbers
+ * @param {string} operationId
+ * @returns {void}
+ */
+function populateValues(cellValues, gridSize, rowNumbers, columnNumbers, operationId) {
+    const cells = document.querySelectorAll('.grid-cell');
+    for (let row = 0; row < gridSize; row++) {
+        for (let column = 0; column < gridSize; column++) {
+            const rowValue = rowNumbers[row];
+            const columnValue = columnNumbers[column];
+            const expectedResult = calculateExpectedResult(rowValue, columnValue, operationId);
+
+            const cellIndex = row * gridSize + column;
             const input = document.createElement('input');
             input.type = 'text';
+            input.classList.add('grid-input');
+
+            const value = cellValues[cellIndex];
+            if (!!value) {
+                const intValue = parseInt(value);
+                input.value = value;
+                if (intValue === expectedResult) {
+                    input.classList.add('correct');
+                } else {
+                    input.classList.add('incorrect');
+                }
+            }
+            input.setAttribute('data-expected-result', String(expectedResult));
             input.addEventListener('input', (e) => {
-                const rowValue = firstColumnNumbers[row - 1];
-                const columnValue = topRowNumbers[col - 1];
-
-                const expectedResult = calculateExpectedResult(rowValue, columnValue, operationId);
                 onInputChange(e.target, expectedResult, totalAnswers);
-                saveCells(cells, correctAnswers);
+                saveCells();
             });
-
-            const index = (row) * (gridSize + 1) + col;
-            cells[index].appendChild(input);
+            cells[cellIndex].appendChild(input);
         }
     }
 }
 
-async function loadData() {
+async function loadGrid() {
     const appElementId = localStorage.getItem('appElementId');
     const operationId = localStorage.getItem('operation');
     const startTimeValue = localStorage.getItem('startTime');
@@ -240,39 +288,23 @@ async function loadData() {
         return;
     }
 
-    console.log({
-        appElementId,
-        operationId,
-        startTimeValue,
-        stopTime,
-        correctAnswers,
-        gridSizeValue,
-        cellValuesValue,
-        topRowNumbersValue,
-        firstColumnNumbersValue
-    });
-
     const app = document.getElementById(appElementId);
     app.classList.add('visible');
+
     const gridSize = parseInt(gridSizeValue);
     const gridSizeInput = document.getElementById('gridSize');
     gridSizeInput.value = gridSize;
 
-    const cellValues = cellValuesValue.split(';');
-    const cells = createBlankGrid(app, gridSize + 1);
-    for (let i = 0; i < cellValues.length; i++) {
-        cells[i].innerText = cellValues[i];
-    }
+    createBlankGrid(app, gridSize);
 
-    createCornerHeader(cells, operationId);
+    const cellValues = cellValuesValue.split(';');
+    const rowNumbers = topRowNumbersValue.split(";").map(Number);
+    const columnNumbers = firstColumnNumbersValue.split(";").map(Number);
+    populateGrid(cellValues, gridSize, rowNumbers, columnNumbers, operationId);
+
     const startTime = parseInt(startTimeValue);
     startTimer(startTime);
     correctAnswers = parseInt(correctAnswersValue);
-
-    const topRowNumbers = topRowNumbersValue.split(";").map(Number);
-    const firstColumnNumbers = firstColumnNumbersValue.split(";").map(Number);
-
-    populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers, operationId);
 }
 
 /**
@@ -294,14 +326,13 @@ function saveData(appElementId, operationId, gridSize, topRowNumbers, firstColum
 }
 
 /**
- * @param {HTMLElement[]} cells
- * @param {number} correctAnswers
  * @returns {void}
  */
-function saveCells(cells, correctAnswers) {
-    const cellValues = cells.map(cell => cell.innerText).join(";");
-    console.log(cellValues);
-    localStorage.setItem('cellValues', String(cellValues));
+function saveCells() {
+    const inputs = document.querySelectorAll('.grid-input');
+    const values = Array.from(inputs).map(input => input.value).join(";");
+
+    localStorage.setItem('cellValues', String(values));
     localStorage.setItem('correctAnswers', String(correctAnswers));
 }
 
@@ -311,7 +342,6 @@ function saveCells(cells, correctAnswers) {
  * @returns {void}
  */
 function onStartClick(appElementId, operationId) {
-    correctAnswers = 0;
 
     const gridSizeInput = document.getElementById('gridSize');
     const gridSize = parseInt(gridSizeInput.value);
@@ -319,18 +349,19 @@ function onStartClick(appElementId, operationId) {
     const app = document.getElementById(appElementId);
     app.classList.add('visible');
 
-    const cells = createBlankGrid(app, gridSize + 1);
+    createBlankGrid(app, gridSize);
 
-    createCornerHeader(cells, operationId);
+    const rowNumbers = generateShuffledNumbers(gridSize);
+    const columnNumbers = generateShuffledNumbers(gridSize);
+    const cellValues = new Array(gridSize * gridSize).fill('');
+    populateGrid(cellValues, gridSize, rowNumbers, columnNumbers, operationId);
 
-    const topRowNumbers = createRowHeader(cells, gridSize);
-    const firstColumnNumbers = createColumnHeader(cells, gridSize);
-
-    populateGrid(cells, gridSize, topRowNumbers, firstColumnNumbers, operationId);
+    correctAnswers = 0;
+    totalAnswers = gridSize * gridSize;
 
     startTimer(Date.now());
 
-    void saveData(appElementId, operationId, gridSize, topRowNumbers, firstColumnNumbers);
+    void saveData(appElementId, operationId, gridSize, rowNumbers, columnNumbers);
 }
 
 export {
@@ -344,4 +375,4 @@ export {
 
 window.operations = operations;
 window.onStartClick = onStartClick;
-window.loadData = loadData;
+window.loadGrid = loadGrid;

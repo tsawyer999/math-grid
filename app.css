@@ -55,6 +55,9 @@ body {
     color: #ff0000;
 }
 
-.app .grid-header {
+.app .grid-header,
+.app .grid-operator-header,
+.app .grid-column-header,
+.app .grid-row-header {
     background-color: #e0e0e0;
 }
