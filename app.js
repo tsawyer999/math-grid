@@ -159,7 +159,6 @@ function onInputChange(input, expectedResult, totalAnswers) {
         }
     }
 
-    console.log(`Correct answers: ${correctAnswers} / ${totalAnswers}`);
     if (correctAnswers === totalAnswers) {
         stopTimer();
     }
@@ -274,18 +273,6 @@ async function loadGrid() {
     const cellValuesValue = localStorage.getItem('cellValues');
     const rowNumbersValue = localStorage.getItem('rowNumbers');
     const columnNumbersValue = localStorage.getItem('columnNumbers');
-
-    console.log({
-        appElementId,
-        operationId,
-        startTimeValue,
-        stopTimeValue,
-        correctAnswersValue,
-        gridSizeValue,
-        cellValuesValue,
-        rowNumbersValue,
-        columnNumbersValue
-    })
 
     if (!(!!appElementId &&
         !!operationId &&
