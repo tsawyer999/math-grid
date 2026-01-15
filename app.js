@@ -33,46 +33,41 @@ let totalAnswers = 0;
 /**
  * @param {HTMLElement} app
  * @param {number} gridSize
- * @returns {HTMLElement[]}
  */
 function createBlankGrid(app, gridSize) {
     app.innerHTML = '';
     app.style.gridTemplateColumns = `repeat(${gridSize + 1}, 1fr)`;
 
-    const cells = [];
-    let cell;
-
-    // grid-operator
-    cell = document.createElement('div');
-    cell.classList.add('grid-header');
-    cell.classList.add('grid-operator-header');
-    app.appendChild(cell);
-
-    // col-header
+    createHeaderCell(app, 'grid-operator-header');
     for (let i = 0; i < gridSize; i++) {
-        cell = document.createElement('div');
-        cell.classList.add('grid-header');
-        cell.classList.add('grid-column-header');
-        app.appendChild(cell);
+        createHeaderCell(app, 'grid-column-header');
     }
 
     for (let i = 0; i < gridSize; i++) {
-
-        // row-header
-        cell = document.createElement('div');
-        cell.classList.add('grid-header');
-        cell.classList.add('grid-row-header');
-        app.appendChild(cell);
+        createHeaderCell(app, 'grid-row-header');
 
         // grid-cell
         for (let i = 0; i < gridSize; i++) {
-            cell = document.createElement('div');
-            cell.classList.add('grid-cell');
-            app.appendChild(cell);
+            createCell(app);
         }
     }
+}
 
-    return cells;
+/**
+ * @param {HTMLElement} app
+ * @param {string} className
+ */
+function createHeaderCell(app, className) {
+    const cell = document.createElement('div');
+    cell.classList.add('grid-header');
+    cell.classList.add(className);
+    app.appendChild(cell);
+}
+
+function createCell(app) {
+    const cell = document.createElement('div');
+    cell.classList.add('grid-cell');
+    app.appendChild(cell);
 }
 
 /**
@@ -93,22 +88,24 @@ function generateShuffledNumbers(maxNumber) {
 }
 
 /**
- * @param {number} startInitialTime
+ * @param {number} startTime
  * @returns {void}
  */
-function startTimer(startInitialTime) {
-    startTime = startInitialTime;
-
+function startTimer(startTime) {
     if (timerInterval) {
         clearInterval(timerInterval);
     }
 
     timerInterval = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startTime) / MS_PER_SECOND);
-        const minutes = Math.floor(elapsed / SECONDS_PER_MINUTE);
-        const seconds = elapsed % SECONDS_PER_MINUTE;
-        timerDiv.textContent = `${minutes} minutes ${seconds} seconds - ${correctAnswers} correct answers`;
+        displayTime(correctAnswers, startTime);
     }, TIMER_UPDATE_INTERVAL);
+}
+
+function displayTime(correctAnswers, startTime, stopTime = Date.now()) {
+    const elapsed = Math.floor((stopTime - startTime) / MS_PER_SECOND);
+    const minutes = Math.floor(elapsed / SECONDS_PER_MINUTE);
+    const seconds = elapsed % SECONDS_PER_MINUTE;
+    timerDiv.textContent = `${minutes} minutes ${seconds} seconds - ${correctAnswers} correct answers`;
 }
 
 /**
@@ -154,16 +151,17 @@ function onInputChange(input, expectedResult, totalAnswers) {
         if (!wasCorrect) {
             correctAnswers++;
         }
-
-        if (correctAnswers === totalAnswers) {
-            stopTimer();
-        }
     } else {
         input.classList.add('incorrect');
         input.classList.remove('correct');
         if (wasCorrect) {
             correctAnswers--;
         }
+    }
+
+    console.log(`Correct answers: ${correctAnswers} / ${totalAnswers}`);
+    if (correctAnswers === totalAnswers) {
+        stopTimer();
     }
 }
 
@@ -259,7 +257,7 @@ function populateValues(cellValues, gridSize, rowNumbers, columnNumbers, operati
             input.setAttribute('data-expected-result', String(expectedResult));
             input.addEventListener('input', (e) => {
                 onInputChange(e.target, expectedResult, totalAnswers);
-                saveCells();
+                saveData();
             });
             cells[cellIndex].appendChild(input);
         }
@@ -270,12 +268,24 @@ async function loadGrid() {
     const appElementId = localStorage.getItem('appElementId');
     const operationId = localStorage.getItem('operation');
     const startTimeValue = localStorage.getItem('startTime');
-    const stopTime = localStorage.getItem('stopTime');
+    const stopTimeValue = localStorage.getItem('stopTime');
     const correctAnswersValue = localStorage.getItem('correctAnswers');
     const gridSizeValue = localStorage.getItem('gridSize');
     const cellValuesValue = localStorage.getItem('cellValues');
-    const topRowNumbersValue = localStorage.getItem('topRowNumbers');
-    const firstColumnNumbersValue = localStorage.getItem('firstColumnNumbers');
+    const rowNumbersValue = localStorage.getItem('rowNumbers');
+    const columnNumbersValue = localStorage.getItem('columnNumbers');
+
+    console.log({
+        appElementId,
+        operationId,
+        startTimeValue,
+        stopTimeValue,
+        correctAnswersValue,
+        gridSizeValue,
+        cellValuesValue,
+        rowNumbersValue,
+        columnNumbersValue
+    })
 
     if (!(!!appElementId &&
         !!operationId &&
@@ -283,57 +293,36 @@ async function loadGrid() {
         !!correctAnswersValue &&
         !!gridSizeValue &&
         !!cellValuesValue &&
-        !!topRowNumbersValue &&
-        !!firstColumnNumbersValue)) {
+        !!rowNumbersValue &&
+        !!columnNumbersValue)) {
         return;
     }
-
-    const app = document.getElementById(appElementId);
-    app.classList.add('visible');
 
     const gridSize = parseInt(gridSizeValue);
     const gridSizeInput = document.getElementById('gridSize');
     gridSizeInput.value = gridSize;
 
+    const app = document.getElementById(appElementId);
+    app.classList.add('visible');
+
     createBlankGrid(app, gridSize);
 
     const cellValues = cellValuesValue.split(';');
-    const rowNumbers = topRowNumbersValue.split(";").map(Number);
-    const columnNumbers = firstColumnNumbersValue.split(";").map(Number);
+    const rowNumbers = rowNumbersValue.split(";").map(Number);
+    const columnNumbers = columnNumbersValue.split(";").map(Number);
     populateGrid(cellValues, gridSize, rowNumbers, columnNumbers, operationId);
 
-    const startTime = parseInt(startTimeValue);
-    startTimer(startTime);
     correctAnswers = parseInt(correctAnswersValue);
-}
+    totalAnswers = gridSize * gridSize;
 
-/**
- * @param {string} appElementId
- * @param {string} operationId
- * @param {number} gridSize
- * @param {number[]} topRowNumbers
- * @param {number[]} firstColumnNumbers
- * @returns {void}
- */
-function saveData(appElementId, operationId, gridSize, topRowNumbers, firstColumnNumbers) {
-    localStorage.setItem('appElementId', appElementId);
-    localStorage.setItem('operation', operationId);
-    localStorage.setItem('startTime', String(startTime));
-    localStorage.setItem('correctAnswers', String(correctAnswers));
-    localStorage.setItem('gridSize', String(gridSize));
-    localStorage.setItem('topRowNumbers', topRowNumbers.join(";"));
-    localStorage.setItem('firstColumnNumbers', firstColumnNumbers.join(";"));
-}
-
-/**
- * @returns {void}
- */
-function saveCells() {
-    const inputs = document.querySelectorAll('.grid-input');
-    const values = Array.from(inputs).map(input => input.value).join(";");
-
-    localStorage.setItem('cellValues', String(values));
-    localStorage.setItem('correctAnswers', String(correctAnswers));
+    const startTime = parseInt(startTimeValue);
+    if (!stopTimeValue) {
+        startTimer(startTime);
+    }
+    else {
+        const stopTime = parseInt(stopTimeValue);
+        displayTime(correctAnswers, startTime, stopTime);
+    }
 }
 
 /**
@@ -351,17 +340,49 @@ function onStartClick(appElementId, operationId) {
 
     createBlankGrid(app, gridSize);
 
+    const cellValues = new Array(gridSize * gridSize).fill('');
     const rowNumbers = generateShuffledNumbers(gridSize);
     const columnNumbers = generateShuffledNumbers(gridSize);
-    const cellValues = new Array(gridSize * gridSize).fill('');
     populateGrid(cellValues, gridSize, rowNumbers, columnNumbers, operationId);
 
-    correctAnswers = 0;
     totalAnswers = gridSize * gridSize;
+    const startTime = Date.now();
+    startTimer(startTime);
 
-    startTimer(Date.now());
+    correctAnswers = 0;
 
-    void saveData(appElementId, operationId, gridSize, rowNumbers, columnNumbers);
+    saveData();
+    void saveMetaData(appElementId, operationId, gridSize, rowNumbers, columnNumbers, startTime);
+}
+
+/**
+ * @param {string} appElementId
+ * @param {string} operationId
+ * @param {number} gridSize
+ * @param {number[]} rowNumbers
+ * @param {number[]} columnNumbers
+ * @param {number} startTime
+ * @returns {void}
+ */
+async function saveMetaData(appElementId, operationId, gridSize, rowNumbers, columnNumbers, startTime) {
+    localStorage.setItem('appElementId', appElementId);
+    localStorage.setItem('operation', operationId);
+    localStorage.setItem('startTime', String(startTime));
+    localStorage.setItem('correctAnswers', String(correctAnswers));
+    localStorage.setItem('gridSize', String(gridSize));
+    localStorage.setItem('rowNumbers', rowNumbers.join(";"));
+    localStorage.setItem('columnNumbers', columnNumbers.join(";"));
+}
+
+/**
+ * @returns {void}
+ */
+function saveData() {
+    const inputs = document.querySelectorAll('.grid-input');
+    const values = Array.from(inputs).map(input => input.value).join(";");
+
+    localStorage.setItem('cellValues', String(values));
+    localStorage.setItem('correctAnswers', String(correctAnswers));
 }
 
 export {
