@@ -12,14 +12,6 @@ const operations = {
 /**
  * @type {number | undefined}
  */
-let startTime;
-/**
- * @type {number | undefined}
- */
-let stopTime;
-/**
- * @type {number | undefined}
- */
 let timerInterval;
 /**
  * @type {number}
@@ -92,16 +84,17 @@ function generateShuffledNumbers(maxNumber) {
  * @returns {void}
  */
 function startTimer(startTime) {
+
     if (timerInterval) {
         clearInterval(timerInterval);
     }
 
     timerInterval = setInterval(() => {
-        displayTime(correctAnswers, startTime);
+        displayTime(correctAnswers, startTime, Date.now());
     }, TIMER_UPDATE_INTERVAL);
 }
 
-function displayTime(correctAnswers, startTime, stopTime = Date.now()) {
+function displayTime(correctAnswers, startTime, stopTime) {
     const elapsed = Math.floor((stopTime - startTime) / MS_PER_SECOND);
     const minutes = Math.floor(elapsed / SECONDS_PER_MINUTE);
     const seconds = elapsed % SECONDS_PER_MINUTE;
@@ -112,7 +105,7 @@ function displayTime(correctAnswers, startTime, stopTime = Date.now()) {
  * @returns {void}
  */
 function stopTimer() {
-    stopTime = Date.now();
+    const stopTime = Date.now();
     localStorage.setItem('stopTime', String(stopTime));
     if (timerInterval) {
         clearInterval(timerInterval);
@@ -355,6 +348,7 @@ async function saveMetaData(appElementId, operationId, gridSize, rowNumbers, col
     localStorage.setItem('appElementId', appElementId);
     localStorage.setItem('operation', operationId);
     localStorage.setItem('startTime', String(startTime));
+    localStorage.removeItem('stopTime');
     localStorage.setItem('correctAnswers', String(correctAnswers));
     localStorage.setItem('gridSize', String(gridSize));
     localStorage.setItem('rowNumbers', rowNumbers.join(";"));
