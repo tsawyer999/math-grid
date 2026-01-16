@@ -17,10 +17,6 @@ let timerInterval;
  * @type {number}
  */
 let correctAnswers = 0;
-/**
- * @type {number}
- */
-let totalAnswers = 0;
 
 /**
  * @param {HTMLElement} app
@@ -230,7 +226,7 @@ function populateValues(cellValues, gridSize, rowNumbers, columnNumbers, operati
             const rowValue = rowNumbers[row];
             const columnValue = columnNumbers[column];
             const expectedResult = calculateExpectedResult(rowValue, columnValue, operationId);
-
+            const totalAnswers = gridSize * gridSize;
             const cellIndex = row * gridSize + column;
             const input = document.createElement('input');
             input.type = 'text';
@@ -293,7 +289,6 @@ async function loadGrid() {
     populateGrid(cellValues, gridSize, rowNumbers, columnNumbers, operationId);
 
     correctAnswers = parseInt(correctAnswersValue);
-    totalAnswers = gridSize * gridSize;
 
     const startTime = parseInt(startTimeValue);
     if (!stopTimeValue) {
@@ -325,7 +320,6 @@ function onStartClick(appElementId, operationId) {
     const columnNumbers = generateShuffledNumbers(gridSize);
     populateGrid(cellValues, gridSize, rowNumbers, columnNumbers, operationId);
 
-    totalAnswers = gridSize * gridSize;
     const startTime = Date.now();
     startTimer(startTime);
 
