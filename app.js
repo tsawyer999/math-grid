@@ -10,9 +10,10 @@ const operations = {
 };
 
 /**
- * @type {number | undefined}
+ * @type {boolean}
  */
-let timerInterval;
+let isTimerStopped = false;
+
 /**
  * @type {number}
  */
@@ -77,20 +78,16 @@ function generateShuffledNumbers(maxNumber) {
 
 /**
  * @param {number} startTime
- * @param {number | undefined} timerInterval
- * @returns {number}
+  * @returns {void}
  */
-function startTimer(startTime, timerInterval) {
+function startTimer(startTime) {
 
-    if (timerInterval) {
-        clearInterval(timerInterval);
-    }
-
-    timerInterval = setInterval(() => {
+    const timerInterval = setInterval(() => {
         displayTime(correctAnswers, startTime, Date.now());
+        if (timerInterval && isTimerStopped) {
+            clearInterval(timerInterval);
+        }
     }, TIMER_UPDATE_INTERVAL);
-
-    return timerInterval;
 }
 
 function displayTime(correctAnswers, startTime, stopTime) {
@@ -101,15 +98,12 @@ function displayTime(correctAnswers, startTime, stopTime) {
 }
 
 /**
- * @param {number | undefined} timerInterval
  * @returns {void}
  */
-function stopTimer(timerInterval) {
+function stopTimer() {
     const stopTime = Date.now();
     localStorage.setItem('stopTime', String(stopTime));
-    if (timerInterval) {
-        clearInterval(timerInterval);
-    }
+    isTimerStopped = true;
 }
 
     /**
@@ -153,7 +147,7 @@ function onInputChange(input, expectedResult, totalAnswers) {
     }
 
     if (correctAnswers === totalAnswers) {
-        stopTimer(timerInterval);
+        stopTimer();
     }
 }
 
@@ -296,7 +290,7 @@ async function loadGrid() {
 
     const startTime = parseInt(startTimeValue);
     if (!stopTimeValue) {
-        timerInterval = startTimer(startTime, timerInterval);
+        startTimer(startTime);
     }
     else {
         const stopTime = parseInt(stopTimeValue);
@@ -325,7 +319,7 @@ function onStartClick(appElementId, operationId) {
     populateGrid(cellValues, gridSize, rowNumbers, columnNumbers, operationId);
 
     const startTime = Date.now();
-    timerInterval = startTimer(startTime, timerInterval);
+    startTimer(startTime);
 
     correctAnswers = 0;
 
