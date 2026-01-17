@@ -77,9 +77,10 @@ function generateShuffledNumbers(maxNumber) {
 
 /**
  * @param {number} startTime
- * @returns {void}
+ * @param {number | undefined} timerInterval
+ * @returns {number}
  */
-function startTimer(startTime) {
+function startTimer(startTime, timerInterval) {
 
     if (timerInterval) {
         clearInterval(timerInterval);
@@ -88,6 +89,8 @@ function startTimer(startTime) {
     timerInterval = setInterval(() => {
         displayTime(correctAnswers, startTime, Date.now());
     }, TIMER_UPDATE_INTERVAL);
+
+    return timerInterval;
 }
 
 function displayTime(correctAnswers, startTime, stopTime) {
@@ -98,9 +101,10 @@ function displayTime(correctAnswers, startTime, stopTime) {
 }
 
 /**
+ * @param {number | undefined} timerInterval
  * @returns {void}
  */
-function stopTimer() {
+function stopTimer(timerInterval) {
     const stopTime = Date.now();
     localStorage.setItem('stopTime', String(stopTime));
     if (timerInterval) {
@@ -149,7 +153,7 @@ function onInputChange(input, expectedResult, totalAnswers) {
     }
 
     if (correctAnswers === totalAnswers) {
-        stopTimer();
+        stopTimer(timerInterval);
     }
 }
 
@@ -292,7 +296,7 @@ async function loadGrid() {
 
     const startTime = parseInt(startTimeValue);
     if (!stopTimeValue) {
-        startTimer(startTime);
+        timerInterval = startTimer(startTime, timerInterval);
     }
     else {
         const stopTime = parseInt(stopTimeValue);
@@ -321,7 +325,7 @@ function onStartClick(appElementId, operationId) {
     populateGrid(cellValues, gridSize, rowNumbers, columnNumbers, operationId);
 
     const startTime = Date.now();
-    startTimer(startTime);
+    timerInterval = startTimer(startTime, timerInterval);
 
     correctAnswers = 0;
 
