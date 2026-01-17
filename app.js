@@ -12,7 +12,7 @@ const operations = {
 /**
  * @type {boolean}
  */
-let isTimerStopped = false;
+let isTimerStarted = false;
 
 /**
  * @type {number}
@@ -81,12 +81,16 @@ function generateShuffledNumbers(maxNumber) {
  * @returns {void}
  */
 function startTimer(startTime) {
-  const timerInterval = setInterval(() => {
-    displayTime(correctAnswers, startTime, Date.now());
-    if (timerInterval && isTimerStopped) {
-      clearInterval(timerInterval);
-    }
-  }, TIMER_UPDATE_INTERVAL);
+  setTimeout(() => {
+    isTimerStarted = true;
+    const timerInterval = setInterval(() => {
+      displayTime(correctAnswers, startTime, Date.now());
+      if (timerInterval && !isTimerStarted) {
+        clearInterval(timerInterval);
+        isTimerStarted = false;
+      }
+    }, TIMER_UPDATE_INTERVAL);
+  }, TIMER_UPDATE_INTERVAL + 100);
 }
 
 function displayTime(correctAnswers, startTime, stopTime) {
@@ -102,7 +106,7 @@ function displayTime(correctAnswers, startTime, stopTime) {
 function stopTimer() {
   const stopTime = Date.now();
   localStorage.setItem("stopTime", String(stopTime));
-  isTimerStopped = true;
+  isTimerStarted = false;
 }
 
 /**
@@ -320,6 +324,7 @@ async function loadGrid() {
  * @returns {void}
  */
 function onStartClick(appElementId, operationId) {
+  stopTimer();
   const gridSizeInput = document.getElementById("gridSize");
   const gridSize = parseInt(gridSizeInput.value);
 
