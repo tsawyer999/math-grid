@@ -4,6 +4,7 @@
   "type": "module",
   "main": "app.js",
   "scripts": {
+    "build": "script/build.sh",
     "test": "jest",
     "lint": "prettier --check .",
     "lint:fix": "prettier --write ."
