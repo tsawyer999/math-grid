@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: math-grid
+  labels:
+    app: math-grid
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: math-grid
+  template:
+    metadata:
+      labels:
+        app: math-grid
+    spec:
+      containers:
+      - name: math-grid
+        image: your-dockerhub-username/math-grid:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"

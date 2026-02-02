@@ -18,12 +18,12 @@ jobs:
         run: bash scripts/build.sh
 
       - name: Create zip archive
-        run: zip -r dist.zip dist/
+        run: zip -r math-grid.${{ github.ref_name }}.zip dist/
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: dist.zip
+          files: math-grid.${{ github.ref_name }}.zip
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
