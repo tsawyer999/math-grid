@@ -1,4 +1,4 @@
-import { initI18n, t } from './i18n.js';
+import { initI18n, t } from "./i18n.js";
 
 const TIMER_UPDATE_INTERVAL = 100;
 const SECONDS_PER_MINUTE = 60;
@@ -99,10 +99,10 @@ function displayTime(correctAnswers, startTime, stopTime) {
   const elapsed = Math.floor((stopTime - startTime) / MS_PER_SECOND);
   const minutes = Math.floor(elapsed / SECONDS_PER_MINUTE);
   const seconds = elapsed % SECONDS_PER_MINUTE;
-  timerDiv.textContent = t('timer_text', {
+  timerDiv.textContent = t("timer_text", {
     minutes: minutes,
     seconds: seconds,
-    correct: correctAnswers
+    correct: correctAnswers,
   });
 }
 
@@ -264,6 +264,16 @@ function populateValues(
         }
       }
       input.setAttribute("data-expected-result", String(expectedResult));
+      input.addEventListener("keydown", (e) => {
+        if (
+          !/^[0-9]$/.test(e.key) &&
+          !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(
+            e.key,
+          )
+        ) {
+          e.preventDefault();
+        }
+      });
       input.addEventListener("input", (e) => {
         onInputChange(e.target, expectedResult, totalAnswers);
         saveData();
