@@ -1,0 +1,8 @@
+{
+  "app_title": "Cuadrícula Matemática",
+  "grid_size": "Tamaño de Cuadrícula:",
+  "addition": "Suma",
+  "multiplication": "Multiplicación",
+  "timer_text": "{{minutes}} minutos {{seconds}} segundos - {{correct}} respuestas correctas",
+  "footer": "Hollox©2026"
+}

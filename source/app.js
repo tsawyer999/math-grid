@@ -1,3 +1,5 @@
+import { initI18n, t } from './i18n.js';
+
 const TIMER_UPDATE_INTERVAL = 100;
 const SECONDS_PER_MINUTE = 60;
 const MS_PER_SECOND = 1000;
@@ -97,7 +99,11 @@ function displayTime(correctAnswers, startTime, stopTime) {
   const elapsed = Math.floor((stopTime - startTime) / MS_PER_SECOND);
   const minutes = Math.floor(elapsed / SECONDS_PER_MINUTE);
   const seconds = elapsed % SECONDS_PER_MINUTE;
-  timerDiv.textContent = `${minutes} minutes ${seconds} seconds - ${correctAnswers} correct answers`;
+  timerDiv.textContent = t('timer_text', {
+    minutes: minutes,
+    seconds: seconds,
+    correct: correctAnswers
+  });
 }
 
 /**
@@ -268,6 +274,9 @@ function populateValues(
 }
 
 async function loadGrid() {
+  // Initialize i18n first
+  await initI18n();
+
   const appElementId = localStorage.getItem("appElementId");
   const operationId = localStorage.getItem("operation");
   const startTimeValue = localStorage.getItem("startTime");

@@ -1,0 +1,8 @@
+{
+  "app_title": "Grille Mathématique",
+  "grid_size": "Taille de la Grille:",
+  "addition": "Addition",
+  "multiplication": "Multiplication",
+  "timer_text": "{{minutes}} minutes {{seconds}} secondes - {{correct}} réponses correctes",
+  "footer": "Hollox©2026"
+}
