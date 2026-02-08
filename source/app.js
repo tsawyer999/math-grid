@@ -1,4 +1,4 @@
-import { initI18n, t } from "./i18n.js";
+import { translate, t } from "./i18n.js";
 
 const TIMER_UPDATE_INTERVAL = 100;
 const SECONDS_PER_MINUTE = 60;
@@ -283,9 +283,11 @@ function populateValues(
   }
 }
 
-async function loadGrid() {
-  // Initialize i18n first
-  await initI18n();
+/**
+ * @param {string} languageId
+ */
+async function loadGrid(languageId) {
+  await translate(languageId);
 
   const appElementId = localStorage.getItem("appElementId");
   const operationId = localStorage.getItem("operation");

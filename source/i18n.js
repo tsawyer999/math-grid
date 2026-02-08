@@ -1,33 +1,34 @@
-let currentLanguage = 'en';
+let currentLanguage = "en";
 let translations = {};
 
 /**
  * Initialize i18n with browser language or default
+ * @param {string} languageId
  */
-async function initI18n() {
-  const browserLang = navigator.language.split('-')[0];
-  const supportedLanguages = ['en', 'es', 'fr'];
+async function translate(languageId) {
+  const browserLang = navigator.language.split("-")[0];
+  const supportedLanguages = ["en", "es", "fr"];
 
-  currentLanguage = supportedLanguages.includes(browserLang) ? browserLang : 'en';
+  // currentLanguage = supportedLanguages.includes(browserLang) ? browserLang : 'en';
 
-  await loadTranslations(currentLanguage);
+  await loadTranslations(languageId || browserLang);
   applyTranslations();
 }
 
 /**
  * Load translation file for specific language
- * @param {string} lang - Language code (en, es, fr)
+ * @param {string} languageId - Language code (en, es, fr)
  */
-async function loadTranslations(lang) {
+async function loadTranslations(languageId) {
   try {
-    const response = await fetch(`locales/${lang}.json`);
+    const response = await fetch(`locales/${languageId}.json`);
     translations = await response.json();
-    currentLanguage = lang;
+    currentLanguage = languageId;
   } catch (error) {
-    console.error(`Failed to load translations for ${lang}:`, error);
+    console.error(`Failed to load translations for ${languageId}:`, error);
     // Fallback to English
-    if (lang !== 'en') {
-      await loadTranslations('en');
+    if (languageId !== "en") {
+      await loadTranslations("en");
     }
   }
 }
@@ -42,7 +43,7 @@ function t(key, params = {}) {
   let text = translations[key] || key;
 
   // Replace {{variable}} with params
-  Object.keys(params).forEach(param => {
+  Object.keys(params).forEach((param) => {
     text = text.replace(`{{${param}}}`, params[param]);
   });
 
@@ -53,22 +54,21 @@ function t(key, params = {}) {
  * Apply translations to elements with data-i18n attribute
  */
 function applyTranslations() {
-  document.querySelectorAll('[data-i18n]').forEach(element => {
-    const key = element.getAttribute('data-i18n');
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    const key = element.getAttribute("data-i18n");
     element.textContent = t(key);
   });
 
-  // Update document title
-  document.title = t('app_title');
+  document.title = t("app_title");
 }
 
 /**
  * Change language dynamically
- * @param {string} lang - Language code
+ * @param {string} languageId - Language code
  */
-async function changeLanguage(lang) {
-  await loadTranslations(lang);
+async function changeLanguage(languageId) {
+  await loadTranslations(languageId);
   applyTranslations();
 }
 
-export { initI18n, t, changeLanguage, currentLanguage };
+export { translate, t, changeLanguage, currentLanguage };
