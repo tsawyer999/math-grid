@@ -27,3 +27,14 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Octopus CLI
+        uses: OctopusDeploy/install-octopus-cli-action@v3
+
+      - name: Push to Octopus Deploy
+        env:
+          OCTOPUS_URL: ${{ vars.OCTOPUS_SERVER_URL }}
+          OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_KEY }}
+          OCTOPUS_SPACE: ${{ vars.OCTOPUS_SPACE }}
+        run: |
+          octopus package upload --package=math-grid.${{ github.ref_name }}.zip

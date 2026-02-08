@@ -14,7 +14,7 @@ rm -rf "$DIST_FOLDER"
 mkdir "$DIST_FOLDER"
 
 # Copy files and folders
-ITEMS=("css" "js" "index.html" "favicon.ico" "locales")
+ITEMS=("css" "js" "index.html" "favicon.ico" "locales" "templates")
 for item in "${ITEMS[@]}"; do
     if [ -e "$SOURCE_FOLDER/$item" ]; then
         cp -r "$SOURCE_FOLDER/$item" "$DIST_FOLDER/"
