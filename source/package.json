@@ -4,8 +4,10 @@
   "type": "module",
   "main": "app.js",
   "scripts": {
-    "build": "script/build.sh",
+    "build": "../scripts/build.sh",
     "serve": "serve .",
+    "docker:start": "../scripts/docker-start.sh",
+    "docker:stop": "../scripts/docker-stop.sh",
     "test": "jest",
     "lint": "prettier --check .",
     "lint:fix": "prettier --write ."
