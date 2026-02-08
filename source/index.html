@@ -1,34 +1,40 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Math Grid</title>
-    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="app.css"/>
     <script type="module" src="i18n.js"></script>
     <script type="module" src="app.js"></script>
-  </head>
-  <body onload="loadGrid('es')">
-    <div class="controls">
-      <label for="gridSize" data-i18n="grid_size">Grid Size:</label>
-      <input type="number" id="gridSize" value="12" min="1" max="20" />
-      <button
-        id="startAddition"
-        onclick="onStartClick('app', operations.addition)"
-        data-i18n="addition"
-      >
+</head>
+<body>
+<div class="controls">
+    <label for="gridSize" data-i18n="grid_size">Grid Size:</label>
+    <input type="number" id="gridSize" value="12" min="1" max="20"/>
+    <button
+            id="startAddition"
+            onclick="onStartClick('app', operations.addition)"
+            data-i18n="addition"
+    >
         Addition
-      </button>
-      <button
-        id="startMultiplication"
-        onclick="onStartClick('app', operations.multiplication)"
-        data-i18n="multiplication"
-      >
+    </button>
+    <button
+            id="startMultiplication"
+            onclick="onStartClick('app', operations.multiplication)"
+            data-i18n="multiplication"
+    >
         Multiplication
-      </button>
-    </div>
-    <div id="timer"></div>
-    <div id="app" class="app"></div>
-  </body>
-  <footer data-i18n="footer">Hollox©2026</footer>
+    </button>
+</div>
+<div id="timer"></div>
+<div id="app" class="app"></div>
+</body>
+<script language="javascript">
+    document.addEventListener(
+        'DOMContentLoaded', () => {
+            loadGrid('es');
+        });
+</script>
+<footer data-i18n="footer">Hollox©2026</footer>
 </html>

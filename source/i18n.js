@@ -8,10 +8,12 @@ let translations = {};
 async function translate(languageId) {
   const browserLang = navigator.language.split("-")[0];
   const supportedLanguages = ["en", "es", "fr"];
+  if (!supportedLanguages.includes(browserLang)) {
+    languageId = "en";
+  }
 
-  // currentLanguage = supportedLanguages.includes(browserLang) ? browserLang : 'en';
+  await loadTranslations(languageId);
 
-  await loadTranslations(languageId || browserLang);
   applyTranslations();
 }
 
@@ -62,13 +64,4 @@ function applyTranslations() {
   document.title = t("app_title");
 }
 
-/**
- * Change language dynamically
- * @param {string} languageId - Language code
- */
-async function changeLanguage(languageId) {
-  await loadTranslations(languageId);
-  applyTranslations();
-}
-
-export { translate, t, changeLanguage, currentLanguage };
+export { translate, t, currentLanguage };
