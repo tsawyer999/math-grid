@@ -284,10 +284,10 @@ function populateValues(
 }
 
 /**
- * @param {string} languageId
+ * @param {string | undefined } forcedLanguageId
  */
-async function loadGrid(languageId) {
-  await translate(languageId);
+async function loadGrid(forcedLanguageId) {
+  await translate(forcedLanguageId);
 
   const appElementId = localStorage.getItem("appElementId");
   const operationId = localStorage.getItem("operation");

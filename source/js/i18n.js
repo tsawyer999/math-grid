@@ -1,24 +1,34 @@
-let currentLanguage = "en";
+const supportedLanguages = ["en", "es", "fr"];
+const defaultLanguage = "en";
+
+let currentLanguage = defaultLanguage;
 let translations = {};
 
 /**
- * Initialize i18n with browser language or default
- * @param {string} languageId
+ * @param {string | undefined} forcedLanguageId
  */
-async function translate(languageId) {
-  const browserLang = navigator.language.split("-")[0];
-  const supportedLanguages = ["en", "es", "fr"];
-  if (!supportedLanguages.includes(browserLang)) {
-    languageId = "en";
-  }
-
-  await loadTranslations(languageId);
-
+async function translate(forcedLanguageId) {
+  const selectedLanguageId = forcedLanguageId || getLanguageId();
+  await loadTranslations(selectedLanguageId);
   applyTranslations();
 }
 
 /**
- * Load translation file for specific language
+ * @returns {string} languageId
+ */
+function getLanguageId() {
+  const browserLanguages = navigator.languages.map((l) => l.split("-")[0]);
+
+  for (const browserLanguage of browserLanguages) {
+    if (supportedLanguages.includes(browserLanguage)) {
+      return browserLanguage;
+    }
+  }
+
+  return defaultLanguage;
+}
+
+/**
  * @param {string} languageId - Language code (en, es, fr)
  */
 async function loadTranslations(languageId) {
@@ -28,15 +38,14 @@ async function loadTranslations(languageId) {
     currentLanguage = languageId;
   } catch (error) {
     console.error(`Failed to load translations for ${languageId}:`, error);
-    // Fallback to English
-    if (languageId !== "en") {
-      await loadTranslations("en");
+
+    if (languageId !== defaultLanguage) {
+      await loadTranslations(defaultLanguage);
     }
   }
 }
 
 /**
- * Get translated text by key
  * @param {string} key - Translation key
  * @param {Object} params - Parameters to replace in translation
  * @returns {string}
@@ -52,9 +61,6 @@ function t(key, params = {}) {
   return text;
 }
 
-/**
- * Apply translations to elements with data-i18n attribute
- */
 function applyTranslations() {
   document.querySelectorAll("[data-i18n]").forEach((element) => {
     const key = element.getAttribute("data-i18n");
