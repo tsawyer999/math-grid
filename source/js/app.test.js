@@ -1,8 +1,4 @@
-import {
-  generateShuffledNumbers,
-  SECONDS_PER_MINUTE,
-  MS_PER_SECOND,
-} from "./app.js";
+import { generateShuffledNumbers } from "./app.js";
 
 describe("Math Grid Application", () => {
   beforeEach(() => {
